@@ -11,7 +11,18 @@ function Login() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await axios.post("http://localhost:8000/token", formData);
+      const response = await axios.post(
+        "http://localhost:8000/token",
+        new URLSearchParams({
+          username: formData.username,
+          password: formData.password,
+        }),
+        {
+          headers: {
+            "Content-Type": "application/x-www-form-urlencoded",
+          },
+        }
+      );
       alert("Login successful!");
       console.log(response.data);
     } catch (error) {
