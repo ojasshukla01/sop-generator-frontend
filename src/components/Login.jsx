@@ -16,13 +16,8 @@ function Login({ onLogin }) {
       const response = await axios.post("http://localhost:8000/token", new URLSearchParams(formData), {
         headers: { "Content-Type": "application/x-www-form-urlencoded" },
       });
-      alert("Login successful!");
       localStorage.setItem("token", response.data.access_token);
-
-      // Fetch user info and update state
-      await onLogin();
-
-      // Redirect to dashboard
+      onLogin();  // Update the state in App.jsx
       navigate("/dashboard");
     } catch (error) {
       alert("Login failed!");

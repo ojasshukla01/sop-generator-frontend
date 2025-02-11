@@ -25,6 +25,8 @@ const Navbar = () => {
             <>
               <Link to="/dashboard" className="text-white">Dashboard</Link>
               <button onClick={handleLogout} className="text-white">Logout</button>
+              <Link to="/sop-form" className="mx-2">Generate SOP</Link>
+
             </>
           )}
         </div>
