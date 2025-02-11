@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import axios from "axios";
 
 function Dashboard() {
@@ -46,6 +46,15 @@ function Dashboard() {
         <div className="bg-white p-6 rounded shadow-lg max-w-md mx-auto">
           <h2 className="text-2xl mb-2">Welcome, <strong>{userInfo.username}</strong>!</h2>
           <p className="text-gray-700">Email: {userInfo.email}</p>
+          
+          <div className="mt-6">
+            <Link to="/sop-form">
+              <button className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 transition">
+                Generate SOP
+              </button>
+            </Link>
+          </div>
+
           <button
             onClick={handleLogout}
             className="mt-4 bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 transition"
