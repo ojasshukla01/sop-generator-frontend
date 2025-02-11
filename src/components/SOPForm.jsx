@@ -2,40 +2,41 @@ import React, { useState } from "react";
 import axios from "axios";
 
 function SOPForm() {
-  const [formData, setFormData] = useState({
-    fullName: "",
-    purposeStatement: "",
-    academicInfo: [{ degree: "", university: "", year: "", gpa: "" }],
-    experience: [{ role: "", company: "", duration: "", description: "" }],
-  });
-  const [generatedSOP, setGeneratedSOP] = useState("");
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
+    const [formData, setFormData] = useState({
+      fullName: "",
+      purposeStatement: "",
+      academicInfo: [{ degree: "", university: "", year: "", gpa: "" }],
+      experience: [{ role: "", company: "", duration: "", description: "" }],
+    });
+    const [generatedSOP, setGeneratedSOP] = useState("");
+    const [format, setFormat] = useState("pdf");  // Default format
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState("");
+  
+    const handleChange = (e) => {
+      const { name, value } = e.target;
+      setFormData({ ...formData, [name]: value });
+    };
 
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData({ ...formData, [name]: value });
-  };
-
-  const handleArrayChange = (e, index, field, arrayName) => {
+    const handleArrayChange = (e, index, field, arrayName) => {
     const updatedArray = formData[arrayName].map((item, i) =>
       i === index ? { ...item, [field]: e.target.value } : item
     );
     setFormData({ ...formData, [arrayName]: updatedArray });
-  };
+    };
 
-  const handleAddItem = (arrayName) => {
+    const handleAddItem = (arrayName) => {
     const newItem =
       arrayName === "academicInfo"
         ? { degree: "", university: "", year: "", gpa: "" }
         : { role: "", company: "", duration: "", description: "" };
     setFormData({ ...formData, [arrayName]: [...formData[arrayName], newItem] });
-  };
+    };
 
-  const validateFormData = () => {
-    if (!formData.fullName || !formData.purposeStatement) {
-      setError("Full Name and Purpose Statement are required.");
-      return false;
+    const validateFormData = () => {
+        if (!formData.fullName || !formData.purposeStatement) {
+        setError("Full Name and Purpose Statement are required.");
+        return false;
     }
     for (const info of formData.academicInfo) {
       if (!info.degree || !info.university || !info.year || !info.gpa) {
@@ -69,18 +70,30 @@ function SOPForm() {
 
       setGeneratedSOP(response.data.sop_content);
     } catch (error) {
-      if (error.response) {
-        console.error("Server responded with an error:", error.response.data);
-        setError("Failed to generate SOP. Please check your data.");
-      } else if (error.request) {
-        console.error("No response received from server:", error.request);
-        setError("Network error. Please try again later.");
-      } else {
-        console.error("Error setting up request:", error.message);
-        setError(error.message);
-      }
+      console.error("Failed to generate SOP:", error);
+      setError("Failed to generate SOP. Please check your data.");
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleDownload = async () => {
+    try {
+      const response = await axios.post(
+        "/download_sop",
+        { sop_content: generatedSOP, format: format },
+        { responseType: "blob" }
+      );
+
+      const url = window.URL.createObjectURL(new Blob([response.data]));
+      const link = document.createElement("a");
+      link.href = url;
+      link.setAttribute("download", `sop.${format}`);
+      document.body.appendChild(link);  
+      link.click();
+    } catch (error) {
+      console.error("Download failed:", error);
+      alert("Failed to download SOP.");
     }
   };
 
@@ -202,9 +215,25 @@ function SOPForm() {
       </form>
 
       {generatedSOP && (
-        <div className="mt-8 p-4 bg-gray-100 rounded">
+        <div className="mt-8">
           <h3 className="text-lg font-semibold">Generated SOP:</h3>
-          <pre>{generatedSOP}</pre>
+          <textarea
+            value={generatedSOP}
+            onChange={(e) => setGeneratedSOP(e.target.value)}
+            className="w-full border p-2 rounded"
+            rows="10"
+          />
+          <div className="mt-4">
+            <label>Select Format: </label>
+            <select onChange={(e) => setFormat(e.target.value)} value={format}>
+              <option value="pdf">PDF</option>
+              <option value="docx">DOCX</option>
+              <option value="txt">TXT</option>
+            </select>
+            <button onClick={handleDownload} className="ml-2 bg-blue-500 text-white px-4 py-2 rounded">
+              Download SOP
+            </button>
+          </div>
         </div>
       )}
     </div>
