@@ -1,8 +1,10 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import axios from "axios";
 
-function Login() {
+function Login({ onLoginSuccess }) {
   const [formData, setFormData] = useState({ username: "", password: "" });
+  const navigate = useNavigate();
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -11,20 +13,11 @@ function Login() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await axios.post(
-        "http://localhost:8000/token",
-        new URLSearchParams({
-          username: formData.username,
-          password: formData.password,
-        }),
-        {
-          headers: {
-            "Content-Type": "application/x-www-form-urlencoded",
-          },
-        }
-      );
+      const response = await axios.post("http://localhost:8000/token", formData);
       alert("Login successful!");
       console.log(response.data);
+      onLoginSuccess();
+      navigate("/dashboard");  // Redirect to dashboard
     } catch (error) {
       alert("Login failed!");
       console.error(error);

@@ -1,31 +1,32 @@
-import React from "react";
-import { BrowserRouter as Router, Route, Routes, Link } from "react-router-dom";
-import Register from "./components/Register";
+import React, { useState } from "react";
+import { BrowserRouter as Router, Routes, Route, Navigate, Link } from "react-router-dom";
 import Login from "./components/Login";
-import Home from "./components/Home";
 import Dashboard from "./components/Dashboard";
+import Home from "./components/Home";
 
 function App() {
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+
+  const handleLoginSuccess = () => {
+    setIsAuthenticated(true);
+  };
+
   return (
     <Router>
-      <div className="container mx-auto p-6">
-        <nav className="flex justify-between items-center bg-blue-500 text-white p-4 rounded">
-          <Link to="/" className="text-lg font-bold hover:text-gray-300 transition">Home</Link>
-          <div className="flex space-x-4">
-            <Link to="/register" className="hover:text-gray-300 transition">Register</Link>
-            <Link to="/login" className="hover:text-gray-300 transition">Login</Link>
-            <Link to="/dashboard" className="hover:text-gray-300 transition">Dashboard</Link>
-          </div>
+      <div>
+        <nav className="p-4 bg-gray-800 text-white">
+          <Link to="/" className="mr-4">Home</Link>
+          {!isAuthenticated ? (
+            <Link to="/login" className="mr-4">Login</Link>
+          ) : (
+            <Link to="/dashboard" className="mr-4">Dashboard</Link>
+          )}
         </nav>
-
-        <div className="mt-6">
-          <Routes>
-            <Route path="/" element={<Home />} />
-            <Route path="/register" element={<Register />} />
-            <Route path="/login" element={<Login />} />
-            <Route path="/dashboard" element={<Dashboard />} />
-          </Routes>
-        </div>
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/login" element={<Login onLoginSuccess={handleLoginSuccess} />} />
+          <Route path="/dashboard" element={isAuthenticated ? <Dashboard /> : <Navigate to="/login" />} />
+        </Routes>
       </div>
     </Router>
   );
