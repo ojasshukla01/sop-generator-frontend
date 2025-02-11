@@ -13,16 +13,18 @@ function Login({ onLoginSuccess }) {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await axios.post("http://localhost:8000/token", formData);
+      console.log("Sending login request with:", formData);
+      const response = await axios.post("http://localhost:8000/token", formData, {
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+      });
+      console.log("Login successful:", response.data);
       alert("Login successful!");
-      console.log(response.data);
-      onLoginSuccess();
-      navigate("/dashboard");  // Redirect to dashboard
     } catch (error) {
+      console.error("Login failed:", error.response ? error.response.data : error.message);
       alert("Login failed!");
-      console.error(error);
     }
   };
+  
 
   return (
     <div className="max-w-md mx-auto bg-white p-6 rounded shadow">
