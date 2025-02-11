@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 
-function Login({ onLoginSuccess }) {
+function Login({ onLogin }) {
   const [formData, setFormData] = useState({ username: "", password: "" });
   const navigate = useNavigate();
 
@@ -13,18 +13,22 @@ function Login({ onLoginSuccess }) {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      console.log("Sending login request with:", formData);
-      const response = await axios.post("http://localhost:8000/token", formData, {
+      const response = await axios.post("http://localhost:8000/token", new URLSearchParams(formData), {
         headers: { "Content-Type": "application/x-www-form-urlencoded" },
       });
-      console.log("Login successful:", response.data);
       alert("Login successful!");
+      localStorage.setItem("token", response.data.access_token);
+
+      // Fetch user info and update state
+      await onLogin();
+
+      // Redirect to dashboard
+      navigate("/dashboard");
     } catch (error) {
-      console.error("Login failed:", error.response ? error.response.data : error.message);
       alert("Login failed!");
+      console.error(error.response ? error.response.data : error.message);
     }
   };
-  
 
   return (
     <div className="max-w-md mx-auto bg-white p-6 rounded shadow">
@@ -52,7 +56,10 @@ function Login({ onLoginSuccess }) {
             required
           />
         </div>
-        <button type="submit" className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition">
+        <button
+          type="submit"
+          className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition"
+        >
           Login
         </button>
       </form>
