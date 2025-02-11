@@ -36,20 +36,17 @@ function SOPForm() {
     e.preventDefault();
     setLoading(true);
     try {
-      const token = localStorage.getItem("token");  // Ensure this retrieves a valid token
-      if (!token) {
-        alert("You are not authorized. Please log in.");
-        setLoading(false);
-        return;
-      }
+      const token = localStorage.getItem("token");
+      if (!token) throw new Error("No token found. Please log in.");
       
-      const response = await axios.post("http://localhost:8000/generate_sop", formData, {
-        headers: { Authorization: `Bearer ${token}` },  // This is the important part
+      const response = await axios.post("/generate_sop", formData, {
+        headers: { Authorization: `Bearer ${token}` },
       });
+  
       setGeneratedSOP(response.data.sop_content);
     } catch (error) {
-      console.error("Failed to generate SOP:", error);
-      alert("Failed to generate SOP. Please try again.");
+      alert("Failed to generate SOP. Please check your data.");
+      console.error(error);
     } finally {
       setLoading(false);
     }
