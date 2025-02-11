@@ -9,8 +9,8 @@ function SOPForm() {
     experience: [{ role: "", company: "", duration: "", description: "" }],
   });
   const [generatedSOP, setGeneratedSOP] = useState("");
-  const [downloadLink, setDownloadLink] = useState("");
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -32,32 +32,64 @@ function SOPForm() {
     setFormData({ ...formData, [arrayName]: [...formData[arrayName], newItem] });
   };
 
+  const validateFormData = () => {
+    if (!formData.fullName || !formData.purposeStatement) {
+      setError("Full Name and Purpose Statement are required.");
+      return false;
+    }
+    for (const info of formData.academicInfo) {
+      if (!info.degree || !info.university || !info.year || !info.gpa) {
+        setError("All academic information fields are required.");
+        return false;
+      }
+    }
+    for (const exp of formData.experience) {
+      if (!exp.role || !exp.company || !exp.duration || !exp.description) {
+        setError("All experience fields are required.");
+        return false;
+      }
+    }
+    setError(""); // Clear any previous errors
+    return true;
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (!validateFormData()) return;
+
     setLoading(true);
+    setGeneratedSOP("");
     try {
       const token = localStorage.getItem("token");
       if (!token) throw new Error("No token found. Please log in.");
-      
-      const response = await axios.post("/generate_sop", formData, {
+
+      const response = await axios.post("http://localhost:8000/generate_sop", formData, {
         headers: { Authorization: `Bearer ${token}` },
       });
-  
+
       setGeneratedSOP(response.data.sop_content);
     } catch (error) {
-      alert("Failed to generate SOP. Please check your data.");
-      console.error(error);
+      if (error.response) {
+        console.error("Server responded with an error:", error.response.data);
+        setError("Failed to generate SOP. Please check your data.");
+      } else if (error.request) {
+        console.error("No response received from server:", error.request);
+        setError("Network error. Please try again later.");
+      } else {
+        console.error("Error setting up request:", error.message);
+        setError(error.message);
+      }
     } finally {
       setLoading(false);
     }
   };
-  
-  
 
   return (
     <div className="max-w-2xl mx-auto p-6 bg-white shadow-md rounded">
       <h2 className="text-2xl font-bold mb-4">SOP Generator</h2>
       <form onSubmit={handleSubmit}>
+        {error && <div className="mb-4 text-red-500">{error}</div>}
+
         <div className="mb-4">
           <label className="block text-gray-700">Full Name</label>
           <input
@@ -173,11 +205,6 @@ function SOPForm() {
         <div className="mt-8 p-4 bg-gray-100 rounded">
           <h3 className="text-lg font-semibold">Generated SOP:</h3>
           <pre>{generatedSOP}</pre>
-          {downloadLink && (
-            <a href={downloadLink} className="text-blue-500 underline mt-2 block" download>
-              Download SOP as PDF
-            </a>
-          )}
         </div>
       )}
     </div>
