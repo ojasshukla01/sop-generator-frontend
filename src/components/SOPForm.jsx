@@ -13,7 +13,8 @@ function SOPForm() {
   const [loading, setLoading] = useState(false);
 
   const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+    setFormData({ ...formData, [name]: value });
   };
 
   const handleArrayChange = (e, index, field, arrayName) => {
@@ -35,16 +36,17 @@ function SOPForm() {
     e.preventDefault();
     setLoading(true);
     try {
-      const token = localStorage.getItem("token");
+      const token = localStorage.getItem("token");  // Ensure this retrieves a valid token
+      if (!token) {
+        alert("You are not authorized. Please log in.");
+        setLoading(false);
+        return;
+      }
+      
       const response = await axios.post("http://localhost:8000/generate_sop", formData, {
-        headers: { Authorization: `Bearer ${token}` },
+        headers: { Authorization: `Bearer ${token}` },  // This is the important part
       });
       setGeneratedSOP(response.data.sop_content);
-
-      // If a file URL is returned, set it for download
-      if (response.data.file_url) {
-        setDownloadLink(response.data.file_url);
-      }
     } catch (error) {
       console.error("Failed to generate SOP:", error);
       alert("Failed to generate SOP. Please try again.");
@@ -52,6 +54,8 @@ function SOPForm() {
       setLoading(false);
     }
   };
+  
+  
 
   return (
     <div className="max-w-2xl mx-auto p-6 bg-white shadow-md rounded">
