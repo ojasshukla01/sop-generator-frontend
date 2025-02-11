@@ -1,11 +1,9 @@
 import React from "react";
-import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
-import Home from "./components/Home";
-import Login from "./components/Login";
+import { BrowserRouter as Router, Route, Routes, Link } from "react-router-dom";
 import Register from "./components/Register";
+import Login from "./components/Login";
+import Home from "./components/Home";
 import Dashboard from "./components/Dashboard";
-import Navbar from "./components/Navbar";
-import ProtectedRoute from "./components/ProtectedRoute";
 
 function App() {
   return (
@@ -30,23 +28,6 @@ function App() {
         </div>
       </div>
     </Router>
-  );
-}
-
-function Home() {
-  return (
-    <div className="text-center mt-10">
-      <h2 className="text-4xl font-bold text-gray-800">Welcome to SOP Generator</h2>
-      <p className="text-gray-600 mt-4">Easily generate and manage your SOPs.</p>
-      <div className="mt-6">
-        <Link to="/register" className="bg-blue-500 text-white px-6 py-3 rounded-lg hover:bg-blue-700 mr-4">
-          Get Started
-        </Link>
-        <Link to="/login" className="bg-gray-500 text-white px-6 py-3 rounded-lg hover:bg-gray-700">
-          Login
-        </Link>
-      </div>
-    </div>
   );
 }
 
