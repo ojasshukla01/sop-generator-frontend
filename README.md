@@ -70,9 +70,6 @@ The application will be available at `http://localhost:5173/`.
 
 Ensure the backend API is running and accessible. The frontend communicates with the backend to fetch generated SOPs based on user input. Update the API endpoint in the frontend code if necessary.
 
-## 📄 License
-
-This project is licensed under the MIT License.
 
 ## 👨‍💻 Author
 
